@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         IMAGE_NAME = "prasadvakada007/hello-api"
         IMAGE_TAG = "latest"
         CONTAINER_NAME = "hello-api-container"
@@ -25,7 +24,9 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                sh "echo Prasad@123 | docker login -u prasadvakada007 --password-stdin"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                }
             }
         }
 
