@@ -9,23 +9,23 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Install dependencies') {
             steps {
-                echo 'Building the Python app...'
-                sh 'python3 --version'
+                sh 'python3 -m venv venv'
+                sh './venv/bin/pip install -r requirements.txt'
             }
         }
 
-        stage('Test') {
+        stage('Run Tests') {
             steps {
-                echo 'Running tests...'
-                sh 'echo "Tests passed!"'
+                sh 'echo "Running tests..."'
+                // You can add pytest or unittest here if available
             }
         }
 
-        stage('Deploy') {
+        stage('Run Application') {
             steps {
-                echo 'Deploying application...'
+                sh './venv/bin/python app.py &'
             }
         }
     }
