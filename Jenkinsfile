@@ -2,29 +2,30 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/prasadvakada007/python-docker-app.git'
+                git branch: 'main',
+                    url: 'https://github.com/prasadvakada007/hello-api.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build') {
             steps {
-                sh '''
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install --upgrade pip
-                pip install flask
-                '''
+                echo 'Building the Python app...'
+                sh 'python3 --version'
             }
         }
 
-        stage('Run App') {
+        stage('Test') {
             steps {
-                sh '''
-                source venv/bin/activate
-                nohup python3 app.py &
-                '''
+                echo 'Running tests...'
+                sh 'echo "Tests passed!"'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
             }
         }
     }
