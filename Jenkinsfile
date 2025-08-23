@@ -3,9 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "prasadvakada007/hello-api"
-        IMAGE_TAG = "latest"
         CONTAINER_NAME = "hello-api-container"
-        APP_PORT = "5000"
     }
 
     stages {
@@ -18,42 +16,40 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+                sh 'docker build -t $IMAGE_NAME:latest .'
             }
         }
 
-       stage('Docker Login') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials',
-                                          usernameVariable: 'DOCKER_USER',
-                                          passwordVariable: 'DOCKER_PASS')]) {
-            sh '''
-                echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            '''
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhublogin',
+                                                  usernameVariable: 'DOCKER_USER',
+                                                  passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
+                }
+            }
         }
-    }
-}
 
         stage('Push to Docker Hub') {
             steps {
-                sh "docker push $IMAGE_NAME:$IMAGE_TAG"
+                sh 'docker push $IMAGE_NAME:latest'
             }
         }
 
         stage('Stop Previous Container') {
             steps {
-                sh """
-                if [ \$(docker ps -q -f name=$CONTAINER_NAME) ]; then
-                    docker stop $CONTAINER_NAME
-                    docker rm $CONTAINER_NAME
-                fi
-                """
+                sh '''
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                '''
             }
         }
 
         stage('Run Container') {
             steps {
-                sh "docker run -d -p $APP_PORT:$APP_PORT --name $CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG"
+                sh 'docker run -d -p 5000:5000 --name $CONTAINER_NAME $IMAGE_NAME:latest'
             }
         }
     }
