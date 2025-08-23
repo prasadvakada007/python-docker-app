@@ -1,10 +1,10 @@
 pipeline {
     agent any
 
-   environment {
-    IMAGE_NAME = "vakada007/hello-api"
-}
-
+    environment {
+        IMAGE_NAME = "vakada007/hello-api"
+        CONTAINER_NAME = "hello-api-container"
+    }
 
     stages {
         stage('Checkout') {
